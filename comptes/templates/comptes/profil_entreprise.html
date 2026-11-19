@@ -1,0 +1,36 @@
+{% extends 'comptes/base.html' %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="profile-container">
+
+        <div class="profile-intro">
+            <div class="profile-icon">🏢</div>
+            <h1>Bienvenue sur Stage&Emploi</h1>
+            <h2>Présentez votre entreprise</h2>
+            <p>
+                Complétez les informations de votre entreprise
+                pour commencer à publier vos offres de stage et d'emploi.
+            </p>
+        </div>
+
+        <div class="profile-form-side">
+            <h2>Profil entreprise</h2>
+            <p class="profile-subtitle">Quelques informations pour commencer.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="profile-fields">
+                    {{ form.as_p }}
+                </div>
+
+                <button type="submit" class="profile-submit">
+                    Enregistrer mon profil →
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

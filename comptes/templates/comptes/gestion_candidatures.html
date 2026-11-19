@@ -1,0 +1,235 @@
+
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Gestion des candidatures | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}
+    Consultez et gérez toutes les candidatures de la plateforme.
+{% endblock %}
+
+{% block content %}
+
+<!-- Conteneur principal de la page -->
+<div class="contact-page">
+
+    <!-- En-tête de la page -->
+    <div class="contact-header">
+        <div>
+            <h1>Gestion des candidatures</h1>
+            <p>Suivez les candidatures et gérez leur évolution.</p>
+        </div>
+    </div>
+
+    <!-- Affichage des messages de confirmation ou d'erreur -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Statistiques des candidatures -->
+    <div class="contact-stats">
+
+        <div class="contact-stat-card">
+            <div>
+                <span>Total candidatures</span>
+                <h2>{{ total_candidatures }}</h2>
+            </div>
+            <i class="fa-solid fa-file-lines"></i>
+        </div>
+
+        <div class="contact-stat-card">
+            <div>
+                <span>Soumises</span>
+                <h2>{{ candidatures_soumises }}</h2>
+            </div>
+            <i class="fa-solid fa-paper-plane"></i>
+        </div>
+
+        <div class="contact-stat-card">
+            <div>
+                <span>En cours</span>
+                <h2>{{ candidatures_en_cours }}</h2>
+            </div>
+            <i class="fa-solid fa-spinner"></i>
+        </div>
+
+        <div class="contact-stat-card">
+            <div>
+                <span>Acceptées</span>
+                <h2>{{ candidatures_acceptees }}</h2>
+            </div>
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div class="contact-stat-card">
+            <div>
+                <span>Refusées</span>
+                <h2>{{ candidatures_refusees }}</h2>
+            </div>
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+
+    </div>
+
+    <!-- Liste et gestion des candidatures -->
+    <div class="contact-list-card">
+
+        <!-- En-tête de la liste et formulaire de recherche -->
+        <div class="contact-list-header">
+            <div>
+                <h3>Liste des candidatures</h3>
+                <p>Consultez et modifiez les candidatures enregistrées.</p>
+            </div>
+
+            <form method="GET" class="contact-search">
+                <input
+                    type="text"
+                    name="recherche"
+                    placeholder="Rechercher une candidature..."
+                    value="{{ recherche }}"
+                >
+                <button type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Tableau des candidatures -->
+        <div class="contact-table-container">
+            <table class="contact-table">
+
+                <!-- Titres des colonnes -->
+                <thead>
+                    <tr>
+                        <th>Étudiant</th>
+                        <th>Offre</th>
+                        <th>Entreprise</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for candidature in candidatures %}
+                    <tr>
+
+                        <!-- Informations de l'étudiant -->
+                        <td>
+                            <strong>
+                                {{ candidature.etudiant.utilisateur.get_full_name|default:candidature.etudiant.utilisateur.username }}
+                            </strong>
+                            <small>
+                                {{ candidature.etudiant.utilisateur.email }}
+                            </small>
+                        </td>
+
+                        <!-- Titre de l'offre concernée -->
+                        <td>{{ candidature.offre.titre }}</td>
+
+                        <!-- Nom de l'entreprise -->
+                        <td>{{ candidature.offre.entreprise.nom_entreprise }}</td>
+
+                        <!-- Date de dépôt de la candidature -->
+                        <td>
+                            {{ candidature.date_candidature|date:"d/m/Y" }}
+                        </td>
+
+                        <!-- Statut actuel de la candidature -->
+                        <td>
+                            <span class="status-badge
+                                {% if candidature.statut == 'ACCEPTEE' %}status-success
+                                {% elif candidature.statut == 'REFUSEE' %}status-danger
+                                {% elif candidature.statut == 'EN_COURS' %}status-warning
+                                {% else %}status-info{% endif %}">
+                                {{ candidature.get_statut_display }}
+                            </span>
+                        </td>
+
+                        <!-- Actions : modifier le statut ou supprimer -->
+                        <td>
+                            <div class="contact-actions">
+
+                                <!-- Formulaire de modification du statut -->
+                                <form method="POST" class="candidature-status-form">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="candidature_id"
+                                           value="{{ candidature.id }}">
+
+                                    <input type="hidden" name="action"
+                                           value="modifier_statut">
+
+                                    <select name="statut" aria-label="Modifier le statut">
+                                        <option value="SOUMISE"
+                                            {% if candidature.statut == 'SOUMISE' %}selected{% endif %}>
+                                            Soumise
+                                        </option>
+
+                                        <option value="EN_COURS"
+                                            {% if candidature.statut == 'EN_COURS' %}selected{% endif %}>
+                                            En cours
+                                        </option>
+
+                                        <option value="ACCEPTEE"
+                                            {% if candidature.statut == 'ACCEPTEE' %}selected{% endif %}>
+                                            Acceptée
+                                        </option>
+
+                                        <option value="REFUSEE"
+                                            {% if candidature.statut == 'REFUSEE' %}selected{% endif %}>
+                                            Refusée
+                                        </option>
+                                    </select>
+
+                                    <button type="submit" class="contact-edit-btn"
+                                            title="Enregistrer le statut">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Formulaire de suppression de la candidature -->
+                                <form method="POST"
+                                      onsubmit="return confirm('Voulez-vous vraiment supprimer cette candidature ?');">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="candidature_id"
+                                           value="{{ candidature.id }}">
+
+                                    <input type="hidden" name="action"
+                                           value="supprimer">
+
+                                    <button type="submit"
+                                            class="contact-delete-btn"
+                                            title="Supprimer">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    <!-- Message affiché lorsqu'aucune candidature n'est trouvée -->
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="contact-empty">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <p>Aucune candidature trouvée.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

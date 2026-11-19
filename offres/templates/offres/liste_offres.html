@@ -1,0 +1,157 @@
+
+{% extends 'comptes/base.html' %}
+
+{% block title %}Nos offres | Stage & Emploi{% endblock %}
+
+{% block content %}
+
+<section class="offers-hero">
+    <div class="container">
+        <span class="hero-label">OPPORTUNITÉS PROFESSIONNELLES</span>
+        <h1>Trouvez l'opportunité qui vous correspond</h1>
+        <p>Explorez les offres de stage et d'emploi publiées par nos entreprises partenaires.</p>
+    </div>
+</section>
+
+<section class="container offers-page">
+
+    <!-- RECHERCHE ET FILTRES -->
+    <form method="GET" class="offers-filter">
+
+        <div class="filter-field">
+            <label>Mot-clé</label>
+            <input
+                type="text"
+                name="recherche"
+                value="{{ request.GET.recherche }}"
+                placeholder="Ex : Développeur web"
+            >
+        </div>
+
+        <div class="filter-field">
+            <label>Type d'offre</label>
+            <select name="type_offre">
+                <option value="">Tous les types</option>
+                <option value="STAGE"
+                    {% if request.GET.type_offre == 'STAGE' %}selected{% endif %}>
+                    Stage
+                </option>
+                <option value="EMPLOI"
+                    {% if request.GET.type_offre == 'EMPLOI' %}selected{% endif %}>
+                    Emploi
+                </option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label>Localisation</label>
+            <input
+                type="text"
+                name="localisation"
+                value="{{ request.GET.localisation }}"
+                placeholder="Ex : Dakar"
+            >
+        </div>
+
+        <button type="submit" class="btn-primary filter-button">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Rechercher
+        </button>
+
+    </form>
+
+    <!-- RESULTATS -->
+    <div class="offers-title">
+        <div>
+            <h2>Offres disponibles</h2>
+            <p>Découvrez les opportunités actuellement ouvertes.</p>
+        </div>
+
+        <span class="results-count">
+            {{ offres|length }} offre(s)
+        </span>
+    </div>
+
+    <div class="offers-list">
+
+        {% for offre in offres %}
+
+        <article class="job-card">
+
+            <div class="job-logo">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div class="job-information">
+
+                <div class="job-tags">
+                    <span class="job-type">
+                        {{ offre.get_type_offre_display }}
+                    </span>
+                    <span class="job-sector">
+                        {{ offre.secteur }}
+                    </span>
+                </div>
+
+                <h3>{{ offre.titre }}</h3>
+
+                <p class="job-company">
+                    {{ offre.entreprise.nom_entreprise }}
+                </p>
+
+                <div class="job-details">
+                    <span>
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ offre.localisation }}
+                    </span>
+
+                    <span>
+                        <i class="fa-regular fa-calendar"></i>
+                        Date limite : {{ offre.date_limite|date:"d/m/Y" }}
+                    </span>
+                </div>
+
+                <p class="job-description">
+                    {{ offre.description|truncatewords:25 }}
+                </p>
+
+            </div>
+
+            <div class="job-action">
+
+                {% if user.is_authenticated and user.role == 'ETUDIANT' %}
+                    <a href="{% url 'postuler' offre.id %}" class="btn-primary">
+                        Postuler <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                {% elif not user.is_authenticated %}
+                    <a href="{% url 'connexion' %}" class="btn-outline">
+                        Se connecter
+                    </a>
+                {% else %}
+                    <span class="job-note">Connectez-vous comme étudiant pour postuler.</span>
+                {% endif %}
+
+            </div>
+
+        </article>
+
+        {% empty %}
+
+        <div class="no-offers">
+            <div class="no-offers-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3>Aucune offre trouvée</h3>
+            <p>Essayez de modifier vos critères de recherche.</p>
+            <a href="{% url 'liste_offres' %}" class="btn-primary">
+                Voir toutes les offres
+            </a>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

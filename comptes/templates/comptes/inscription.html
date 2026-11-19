@@ -1,0 +1,100 @@
+{% extends 'comptes/base.html' %}
+
+{% block title %}Inscription | Stage&Emploi{% endblock %}
+
+{% block content %}
+
+<section class="register-page">
+
+    <div class="register-card">
+
+        <div class="register-side">
+            <div class="register-brand">
+                <i class="fas fa-graduation-cap"></i>
+                Stage&Emploi
+            </div>
+
+            <div class="register-side-content">
+                <span>BIENVENUE DANS NOTRE COMMUNAUTÉ</span>
+                <h1>Donnez vie à vos ambitions professionnelles.</h1>
+                <p>
+                    Trouvez des stages, découvrez des opportunités
+                    et construisez votre avenir professionnel.
+                </p>
+
+                <div class="register-benefit">
+                    <i class="fas fa-check-circle"></i>
+                    Des offres adaptées à votre profil
+                </div>
+
+                <div class="register-benefit">
+                    <i class="fas fa-check-circle"></i>
+                    Un espace personnel sécurisé
+                </div>
+
+                <div class="register-benefit">
+                    <i class="fas fa-check-circle"></i>
+                    Une connexion avec les entreprises
+                </div>
+            </div>
+
+            <div class="register-side-footer">
+                Votre avenir commence aujourd'hui.
+            </div>
+        </div>
+
+        <div class="register-form-side">
+
+            <div class="register-heading">
+                <span class="register-tag">REJOIGNEZ-NOUS</span>
+                <h2>Créer un compte</h2>
+                <p>Quelques informations suffisent pour commencer.</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="auth-message">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="register-field">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small class="register-help">
+                                {{ field.help_text|safe }}
+                            </small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="register-submit">
+                    Créer mon compte
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="register-login">
+                Vous avez déjà un compte ?
+                <a href="{% url 'connexion' %}">Se connecter</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

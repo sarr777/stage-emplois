@@ -1,0 +1,224 @@
+
+{% extends 'comptes/base.html' %}
+
+{% block title %}Espace entreprise | StageUp{% endblock %}
+
+{% block content %}
+
+<!-- Section principale du tableau de bord de l'entreprise -->
+<section class="dashboard container">
+
+    <!-- Message de bienvenue et bouton de publication d'une offre -->
+    <div class="dashboard-welcome">
+        <div>
+            <span class="hero-label">ESPACE ENTREPRISE</span>
+            <h1>Bienvenue, {{ profil.nom_entreprise }} !</h1>
+            <p>Gérez vos offres et examinez les candidatures reçues.</p>
+        </div>
+
+        <!-- Lien vers le formulaire de création d'une offre -->
+        <a href="{% url 'ajouter_offre' %}" class="btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Publier une offre
+        </a>
+    </div>
+
+    <!-- Affichage des statistiques de l'entreprise -->
+    <div class="dashboard-stats">
+
+        <!-- Nombre total d'offres publiées -->
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div>
+                <p>Total des offres</p>
+                <h2>{{ offres|length }}</h2>
+            </div>
+        </div>
+
+        <!-- Nombre total de candidatures reçues -->
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+                <p>Candidatures reçues</p>
+                <h2>{{ candidatures|length }}</h2>
+            </div>
+        </div>
+
+        <!-- Nombre d'offres encore ouvertes -->
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <div>
+                <p>Offres ouvertes</p>
+                <h2>{{ offres_ouvertes }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MES OFFRES -->
+
+    <!-- Partie consacrée à la gestion des offres publiées -->
+    <div class="dashboard-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Mes offres publiées</h2>
+                <p>Consultez et gérez vos opportunités.</p>
+            </div>
+        </div>
+
+        <!-- Tableau contenant les offres de l'entreprise -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Type</th>
+                        <th>Date limite</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- Parcours de la liste des offres -->
+                    {% for offre in offres %}
+                    <tr>
+                        <td>{{ offre.titre }}</td>
+                        <td>{{ offre.get_type_offre_display }}</td>
+                        <td>{{ offre.date_limite|date:"d/m/Y" }}</td>
+
+                        <!-- Vérification du statut de l'offre -->
+                        <td>
+                            {% if offre.statut %}
+                                <span class="status-badge status-acceptee">Ouverte</span>
+                            {% else %}
+                                <span class="status-badge status-refusee">Fermée</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions disponibles pour chaque offre -->
+                        <td>
+                            <!-- Lien pour modifier l'offre -->
+                            <a href="{% url 'modifier_offre' offre.id %}">
+                                Modifier
+                            </a>
+
+                            <!-- Bouton pour fermer une offre encore ouverte -->
+                            {% if offre.statut %}
+                            <form method="POST"
+                                action="{% url 'fermer_offre' offre.id %}"
+                                style="display:inline;">
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        onclick="return confirm('Voulez-vous vraiment fermer cette offre ?')">
+                                    Fermer
+                                </button>
+                            </form>
+                            {% else %}
+                                <span>Offre fermée</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Message affiché si aucune offre n'est publiée -->
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-table">
+                            Vous n'avez publié aucune offre.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CANDIDATURES REÇUES -->
+
+    <!-- Partie consacrée aux candidatures envoyées par les étudiants -->
+    <div class="dashboard-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Candidatures reçues</h2>
+                <p>Examinez les profils et actualisez les statuts.</p>
+            </div>
+        </div>
+
+        <!-- Tableau des candidatures reçues par l'entreprise -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Étudiant</th>
+                        <th>Offre</th>
+                        <th>Date</th>
+                        <th>Statut actuel</th>
+                        <th>Décision</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- Parcours de toutes les candidatures reçues -->
+                    {% for candidature in candidatures %}
+                    <tr>
+                        <td>{{ candidature.etudiant.utilisateur.username }}</td>
+                        <td>{{ candidature.offre.titre }}</td>
+                        <td>{{ candidature.date_candidature|date:"d/m/Y" }}</td>
+                        <td>{{ candidature.get_statut_display }}</td>
+
+                        <!-- Formulaire permettant de modifier le statut d'une candidature -->
+                        <td>
+                            <form method="POST"
+                                  action="{% url 'changer_statut' candidature.id %}"
+                                  class="status-form">
+                                {% csrf_token %}
+
+                                <!-- Liste des décisions possibles -->
+                                <select name="statut">
+                                    <option value="EN_COURS"
+                                        {% if candidature.statut == 'EN_COURS' %}selected{% endif %}>
+                                        En cours
+                                    </option>
+                                    <option value="ACCEPTEE"
+                                        {% if candidature.statut == 'ACCEPTEE' %}selected{% endif %}>
+                                        Acceptée
+                                    </option>
+                                    <option value="REFUSEE"
+                                        {% if candidature.statut == 'REFUSEE' %}selected{% endif %}>
+                                        Refusée
+                                    </option>
+                                </select>
+
+                                <!-- Bouton pour enregistrer la nouvelle décision -->
+                                <button type="submit" class="btn-primary">
+                                    Valider
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <!-- Message affiché lorsqu'aucune candidature n'a été reçue -->
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-table">
+                            Aucune candidature reçue pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Tableau de bord | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}
+Gestion de la plateforme Stage&Emploi
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">ESPACE ADMINISTRATION</span>
+        <h1>Tableau de bord</h1>
+        <p>Bienvenue dans votre espace de gestion.</p>
+    </div>
+
+    <a href="/admin/" class="btn-primary">
+        <i class="fa-solid fa-gear"></i>
+        Administration complète
+    </a>
+</div>
+
+<div class="stats-grid">
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_utilisateurs }}</h3>
+            <p>Utilisateurs</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_etudiants }}</h3>
+            <p>Étudiants</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-building"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_entreprises }}</h3>
+            <p>Entreprises</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_offres }}</h3>
+            <p>Offres publiées</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.offres_actives }}</h3>
+            <p>Offres actives</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-file-lines"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_candidatures }}</h3>
+            <p>Candidatures</p>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon">
+            <i class="fa-solid fa-envelope"></i>
+        </div>
+        <div>
+            <h3>{{ statistiques.total_messages }}</h3>
+            <p>Messages reçus</p>
+            <small>{{ statistiques.messages_non_lus }} non lus</small>
+        </div>
+    </div>
+
+</div>
+
+<section class="admin-actions">
+
+    <h2>Gestion de la plateforme</h2>
+
+    <p class="admin-section-description">
+        Accédez rapidement aux différentes fonctionnalités.
+    </p>
+
+    <div class="action-grid">
+
+        <a href="{% url 'gestion_utilisateurs' %}" class="action-card">
+            <i class="fa-solid fa-users"></i>
+            <h3>Utilisateurs</h3>
+            <p>Gérer les comptes et les rôles.</p>
+        </a>
+
+        <a href="/admin/offres/offre/" class="action-card">
+            <i class="fa-solid fa-briefcase"></i>
+            <h3>Offres</h3>
+            <p>Consulter et modérer les offres.</p>
+        </a>
+
+        <a href="/admin/candidatures/candidature/" class="action-card">
+            <i class="fa-solid fa-file-lines"></i>
+            <h3>Candidatures</h3>
+            <p>Consulter les candidatures reçues.</p>
+        </a>
+
+        <a href="/admin/comptes/etudiant/" class="action-card">
+            <i class="fa-solid fa-user-graduate"></i>
+            <h3>Étudiants</h3>
+            <p>Consulter les profils étudiants.</p>
+        </a>
+
+        <a href="/admin/comptes/entreprise/" class="action-card">
+            <i class="fa-solid fa-building"></i>
+            <h3>Entreprises</h3>
+            <p>Consulter les profils entreprises.</p>
+        </a>
+
+        <a href="{% url 'messages_contact' %}" class="action-card">
+            <i class="fa-solid fa-envelope"></i>
+            <h3>Messages de contact</h3>
+            <p>Consulter et gérer les messages reçus.</p>
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

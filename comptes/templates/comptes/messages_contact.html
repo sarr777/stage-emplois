@@ -1,0 +1,196 @@
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Messages de contact | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}
+Gestion des messages reçus
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">GESTION DES CONTACTS</span>
+        <h1>Messages de contact</h1>
+        <p>Consultez et gérez les messages envoyés par les visiteurs.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="contact-alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="contact-stats">
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-envelope"></i>
+        <div>
+            <h3>{{ total_messages }}</h3>
+            <p>Total des messages</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-envelope-open"></i>
+        <div>
+            <h3>{{ messages_non_lus }}</h3>
+            <p>Messages non lus</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="contact-admin-panel">
+
+    <div class="contact-admin-heading">
+        <div>
+            <h2>Boîte de réception</h2>
+            <p>Liste des messages reçus</p>
+        </div>
+
+        <form method="GET" class="contact-search">
+            <input type="text" name="recherche"
+                   value="{{ recherche }}"
+                   placeholder="Rechercher un message...">
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="contact-table-wrapper">
+        <table class="contact-admin-table">
+            <thead>
+                <tr>
+                    <th>Expéditeur</th>
+                    <th>Sujet</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for contact in contacts %}
+                <tr>
+                    <td>
+                        <strong>{{ contact.nom }}</strong>
+                        <small>{{ contact.email }}</small>
+                    </td>
+
+                    <td>{{ contact.sujet }}</td>
+
+                    <td>{{ contact.date_envoi|date:"d/m/Y H:i" }}</td>
+
+                    <td>
+                        {% if contact.lu %}
+                            <span class="contact-badge read">Lu</span>
+                        {% else %}
+                            <span class="contact-badge unread">Non lu</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="contact-actions">
+
+                        <button type="button" class="contact-view-btn"
+                            onclick="voirMessage(this)"
+                            data-nom="{{ contact.nom|escape }}"
+                            data-email="{{ contact.email|escape }}"
+                            data-sujet="{{ contact.sujet|escape }}"
+                            data-message="{{ contact.message|escape }}"
+                            data-date="{{ contact.date_envoi|date:'d/m/Y H:i' }}">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="contact_id" value="{{ contact.id }}">
+
+                            {% if contact.lu %}
+                                <input type="hidden" name="action" value="non_lu">
+                                <button class="contact-status-btn" title="Marquer non lu">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </button>
+                            {% else %}
+                                <input type="hidden" name="action" value="lu">
+                                <button class="contact-status-btn" title="Marquer comme lu">
+                                    <i class="fa-solid fa-envelope-open"></i>
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <form method="POST"
+                              onsubmit="return confirm('Supprimer ce message ?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="contact_id" value="{{ contact.id }}">
+                            <input type="hidden" name="action" value="supprimer">
+                            <button class="contact-delete-btn" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="contact-empty">
+                        <i class="fa-solid fa-inbox"></i>
+                        <h3>Aucun message trouvé</h3>
+                        <p>Les messages reçus apparaîtront ici.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+<!-- Fenêtre de lecture -->
+<div id="messageModal" class="contact-modal">
+    <div class="contact-modal-content">
+
+        <button class="contact-modal-close" onclick="fermerMessage()">
+            &times;
+        </button>
+
+        <span class="section-tag">MESSAGE REÇU</span>
+        <h2 id="modalSujet"></h2>
+
+        <p><strong>Nom :</strong> <span id="modalNom"></span></p>
+        <p><strong>E-mail :</strong> <span id="modalEmail"></span></p>
+        <p><strong>Date :</strong> <span id="modalDate"></span></p>
+
+        <div class="contact-message-content" id="modalMessage"></div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function voirMessage(button) {
+    document.getElementById('modalNom').textContent = button.dataset.nom;
+    document.getElementById('modalEmail').textContent = button.dataset.email;
+    document.getElementById('modalSujet').textContent = button.dataset.sujet;
+    document.getElementById('modalDate').textContent = button.dataset.date;
+    document.getElementById('modalMessage').textContent = button.dataset.message;
+
+    document.getElementById('messageModal').classList.add('show');
+}
+
+function fermerMessage() {
+    document.getElementById('messageModal').classList.remove('show');
+}
+
+document.getElementById('messageModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        fermerMessage();
+    }
+});
+</script>
+{% endblock %}

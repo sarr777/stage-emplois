@@ -1,0 +1,312 @@
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Entreprises | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}Gestion des entreprises{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">GESTION DES COMPTES</span>
+        <h1>Entreprises</h1>
+        <p>Consultez et gérez les entreprises inscrites sur la plateforme.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="contact-alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<!-- STATISTIQUES -->
+<div class="contact-stats">
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-building"></i>
+        <div>
+            <h3>{{ total_entreprises }}</h3>
+            <p>Total entreprises</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+            <h3>{{ entreprises_actives }}</h3>
+            <p>Entreprises actives</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+            <h3>{{ entreprises_inactives }}</h3>
+            <p>Entreprises inactives</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- TABLEAU DES ENTREPRISES -->
+<section class="contact-admin-panel">
+
+    <div class="contact-admin-heading">
+        <div>
+            <h2>Liste des entreprises</h2>
+            <p>Ensemble des entreprises inscrites sur Stage&Emploi</p>
+        </div>
+
+        <form method="GET" class="contact-search">
+            <input
+                type="text"
+                name="recherche"
+                value="{{ recherche }}"
+                placeholder="Rechercher une entreprise..."
+            >
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="contact-table-wrapper">
+        <table class="contact-admin-table">
+
+            <thead>
+                <tr>
+                    <th>Entreprise</th>
+                    <th>Responsable</th>
+                    <th>E-mail</th>
+                    <th>Secteur</th>
+                    <th>Statut</th>
+                    <th>Inscription</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for entreprise in entreprises %}
+
+                <tr>
+
+                    <td>
+                        <strong>{{ entreprise.nom_entreprise }}</strong>
+                    </td>
+
+                    <td>
+                        {{ entreprise.utilisateur.username }}
+                        <small>
+                            {{ entreprise.utilisateur.first_name }}
+                            {{ entreprise.utilisateur.last_name }}
+                        </small>
+                    </td>
+
+                    <td>{{ entreprise.utilisateur.email }}</td>
+
+                    <td>{{ entreprise.secteur }}</td>
+
+                    <td>
+                        {% if entreprise.utilisateur.is_active %}
+                            <span class="contact-badge read">Actif</span>
+                        {% else %}
+                            <span class="contact-badge unread">Inactif</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ entreprise.utilisateur.date_joined|date:"d/m/Y" }}
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td class="contact-actions">
+
+                        {% if entreprise.utilisateur != request.user and not entreprise.utilisateur.is_superuser %}
+
+                            <!-- MODIFIER -->
+                            <button
+                                type="button"
+                                class="contact-status-btn"
+                                title="Modifier"
+                                onclick="ouvrirModification(
+                                    '{{ entreprise.id }}',
+                                    '{{ entreprise.nom_entreprise|escapejs }}',
+                                    '{{ entreprise.secteur|escapejs }}',
+                                    '{{ entreprise.utilisateur.username|escapejs }}',
+                                    '{{ entreprise.utilisateur.email|escapejs }}'
+                                )">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+
+                            <!-- ACTIVER / DESACTIVER -->
+                            <form method="POST">
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="entreprise_id"
+                                    value="{{ entreprise.id }}"
+                                >
+
+                                {% if entreprise.utilisateur.is_active %}
+
+                                    <input type="hidden" name="action" value="desactiver">
+
+                                    <button
+                                        type="submit"
+                                        class="contact-status-btn"
+                                        title="Désactiver">
+                                        <i class="fa-solid fa-user-slash"></i>
+                                    </button>
+
+                                {% else %}
+
+                                    <input type="hidden" name="action" value="activer">
+
+                                    <button
+                                        type="submit"
+                                        class="contact-status-btn"
+                                        title="Activer">
+                                        <i class="fa-solid fa-user-check"></i>
+                                    </button>
+
+                                {% endif %}
+                            </form>
+
+                            <!-- SUPPRIMER -->
+                            <form
+                                method="POST"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer cette entreprise ?');">
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="entreprise_id"
+                                    value="{{ entreprise.id }}"
+                                >
+
+                                <input type="hidden" name="action" value="supprimer">
+
+                                <button
+                                    type="submit"
+                                    class="contact-delete-btn"
+                                    title="Supprimer">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <span class="contact-badge read">Compte protégé</span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7" class="contact-empty">
+                        <i class="fa-solid fa-building"></i>
+                        <h3>Aucune entreprise trouvée</h3>
+                        <p>Les entreprises apparaîtront ici.</p>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</section>
+
+<!-- FENÊTRE DE MODIFICATION -->
+<div id="modalModification" class="contact-modal">
+
+    <div class="contact-modal-content">
+
+        <h2>Modifier une entreprise</h2>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="entreprise_id" id="edit_id">
+            <input type="hidden" name="action" value="modifier">
+
+            <label>Nom de l'entreprise</label>
+            <input
+                type="text"
+                name="nom_entreprise"
+                id="edit_nom"
+                required
+            >
+
+            <label>Secteur d'activité</label>
+            <input
+                type="text"
+                name="secteur"
+                id="edit_secteur"
+                required
+            >
+
+            <label>Nom d'utilisateur</label>
+            <input
+                type="text"
+                name="username"
+                id="edit_username"
+                required
+            >
+
+            <label>Adresse e-mail</label>
+            <input
+                type="email"
+                name="email"
+                id="edit_email"
+                required
+            >
+
+            <div class="modal-actions">
+                <button
+                    type="button"
+                    onclick="fermerModification()">
+                    Annuler
+                </button>
+
+                <button type="submit">
+                    Enregistrer
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+function ouvrirModification(id, nom, secteur, username, email) {
+
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_nom').value = nom;
+    document.getElementById('edit_secteur').value = secteur;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_email').value = email;
+
+    document.getElementById('modalModification').style.display = 'flex';
+}
+
+function fermerModification() {
+    document.getElementById('modalModification').style.display = 'none';
+}
+</script>
+
+{% endblock %}

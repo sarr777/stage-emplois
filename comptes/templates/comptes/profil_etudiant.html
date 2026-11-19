@@ -1,0 +1,95 @@
+{% extends 'comptes/base.html' %}
+
+{% block title %}Mon profil étudiant | Stage&Emploi{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+    <div class="profile-container">
+
+        <div class="profile-intro">
+            <div class="profile-brand">
+                <i class="fas fa-graduation-cap"></i>
+                Stage&Emploi
+            </div>
+
+            <div class="profile-intro-content">
+                <span>ESPACE ÉTUDIANT</span>
+                <h1>Préparez votre avenir professionnel.</h1>
+                <p>
+                    Complétez votre profil pour découvrir des opportunités
+                    adaptées à votre formation et à vos compétences.
+                </p>
+
+                <div class="profile-info">
+                    <i class="fas fa-check-circle"></i>
+                    Présentez votre parcours académique
+                </div>
+
+                <div class="profile-info">
+                    <i class="fas fa-check-circle"></i>
+                    Valorisez vos compétences
+                </div>
+
+                <div class="profile-info">
+                    <i class="fas fa-check-circle"></i>
+                    Accédez aux offres de stage
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-form-side">
+
+            <div class="profile-heading">
+                <span class="profile-tag">DERNIÈRE ÉTAPE</span>
+                <h2>Complétez votre profil</h2>
+                <p>Quelques informations pour mieux vous présenter.</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="auth-message">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="profile-field">
+                    <label for="{{ form.formation.id_for_label }}">
+                        Votre formation
+                    </label>
+                    {{ form.formation }}
+
+                    {% for error in form.formation.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="profile-field">
+                    <label for="{{ form.competences.id_for_label }}">
+                        Vos compétences
+                    </label>
+                    {{ form.competences }}
+
+                    <small class="profile-hint">
+                        Exemple : HTML, CSS, JavaScript, Python, Django...
+                    </small>
+
+                    {% for error in form.competences.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="profile-submit">
+                    Enregistrer mon profil
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

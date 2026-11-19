@@ -1,0 +1,74 @@
+
+{% extends 'comptes/base.html' %}
+
+{% block title %}{{ titre }} | Stage & Emploi{% endblock %}
+
+{% block content %}
+
+<section class="form-hero">
+    <div>
+        <span class="hero-label">ESPACE ENTREPRISE</span>
+        <h1>{{ titre }}</h1>
+        <p>Publiez votre opportunité et trouvez les talents dont votre entreprise a besoin.</p>
+    </div>
+</section>
+
+<section class="container publication-section">
+
+    <div class="publication-card">
+
+        <div class="publication-heading">
+            <div class="publication-icon">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div>
+                <h2>Informations sur l'offre</h2>
+                <p>Remplissez les champs ci-dessous.</p>
+            </div>
+        </div>
+
+        <form method="POST" class="publication-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}<span>*</span>{% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <small class="field-error">{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="field-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <a href="{% url 'tableau_entreprise' %}" class="btn-outline">
+                    Annuler
+                </a>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Enregistrer l'offre
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

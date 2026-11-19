@@ -1,0 +1,119 @@
+{% extends 'comptes/base.html' %}
+
+{% block title %}Postuler | Stage & Emploi{% endblock %}
+
+{% block content %}
+
+<section class="form-hero">
+    <div>
+        <span class="hero-label">CANDIDATURE EN LIGNE</span>
+        <h1>Donnez une chance à votre avenir</h1>
+        <p>Présentez votre motivation et candidatez à cette opportunité.</p>
+    </div>
+</section>
+
+<section class="container application-section">
+    <div class="application-layout">
+
+        <!-- INFORMATIONS DE L'OFFRE -->
+        <div class="application-offer">
+            <div class="application-offer-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <span class="job-type">{{ offre.get_type_offre_display }}</span>
+
+            <h2>{{ offre.titre }}</h2>
+
+            <p class="application-company">
+                {{ offre.entreprise.nom_entreprise }}
+            </p>
+
+            <div class="application-detail">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ offre.localisation }}
+            </div>
+
+            <div class="application-detail">
+                <i class="fa-solid fa-layer-group"></i>
+                {{ offre.secteur }}
+            </div>
+
+            <div class="application-detail">
+                <i class="fa-regular fa-calendar"></i>
+                Date limite : {{ offre.date_limite|date:"d/m/Y" }}
+            </div>
+
+            <div class="application-description">
+                <h3>Description de l'offre</h3>
+                <p>{{ offre.description|linebreaksbr }}</p>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE -->
+        <div class="application-form-card">
+
+            <div class="publication-heading">
+                <div class="publication-icon">
+                    <i class="fa-solid fa-file-signature"></i>
+                </div>
+                <div>
+                    <h2>Ma candidature</h2>
+                    <p>Expliquez pourquoi vous êtes le bon candidat.</p>
+                </div>
+            </div>
+
+            <form method="POST"
+                  onsubmit="return confirm('Voulez-vous vraiment envoyer votre candidature ?');">
+                {% csrf_token %}
+
+                <div class="form-field">
+                    <label for="lettre_motivation">
+                        Lettre de motivation <span>*</span>
+                    </label>
+
+                    <textarea
+                        name="lettre_motivation"
+                        id="lettre_motivation"
+                        rows="10"
+                        placeholder="Présentez votre parcours, vos compétences et vos motivations..."
+                        minlength="30"
+                        required
+                    ></textarea>
+
+                    <div class="application-character-count">
+                        <small>Minimum 30 caractères.</small>
+                        <small><span id="characterCount">0</span> caractères</small>
+                    </div>
+
+                    <small>
+                        Rédigez une lettre claire et adaptée à cette offre.
+                    </small>
+                </div>
+
+                <div class="application-actions">
+                    <a href="{% url 'liste_offres' %}" class="btn-outline">
+                        Annuler
+                    </a>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Envoyer ma candidature
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    const lettre = document.getElementById('lettre_motivation');
+    const compteur = document.getElementById('characterCount');
+
+    lettre.addEventListener('input', function () {
+        compteur.textContent = this.value.length;
+    });
+</script>
+
+{% endblock %}

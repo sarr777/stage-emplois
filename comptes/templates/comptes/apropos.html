@@ -1,0 +1,200 @@
+{% extends 'comptes/base.html' %}
+
+{% block title %}À propos | Stage & Emploi{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <div class="about-hero-content">
+        <span class="about-tag">
+            <i class="fa-solid fa-circle-info"></i>
+            QUI SOMMES-NOUS ?
+        </span>
+
+        <h1>
+            Construisons ensemble
+            <span>votre avenir professionnel.</span>
+        </h1>
+
+        <p>
+            Stage&Emploi est une plateforme qui facilite la rencontre
+            entre les étudiants à la recherche d'opportunités et les
+            entreprises qui souhaitent recruter de nouveaux talents.
+        </p>
+
+        <div class="about-hero-buttons">
+            <a href="{% url 'liste_offres' %}" class="btn-primary">
+                Découvrir les offres
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <a href="{% url 'contact' %}" class="btn-outline">
+                Nous contacter
+            </a>
+        </div>
+    </div>
+
+    <div class="about-hero-visual">
+        <div class="about-visual-circle">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+
+        <div class="about-floating-card about-card-one">
+            <i class="fa-solid fa-briefcase"></i>
+            <div>
+                <strong>Opportunités</strong>
+                <small>Stages et emplois</small>
+            </div>
+        </div>
+
+        <div class="about-floating-card about-card-two">
+            <i class="fa-solid fa-users"></i>
+            <div>
+                <strong>Connexion</strong>
+                <small>Étudiants et entreprises</small>
+            </div>
+        </div>
+
+        <div class="about-decoration"></div>
+    </div>
+</section>
+
+<section class="about-intro container">
+    <div class="about-section-heading">
+        <span>NOTRE PRÉSENTATION</span>
+        <h2>Bienvenue sur Stage&Emploi</h2>
+        <p>
+            Une plateforme pensée pour rapprocher les talents
+            des opportunités professionnelles.
+        </p>
+    </div>
+
+    <div class="about-intro-grid">
+        <div class="about-intro-icon">
+            <i class="fa-solid fa-lightbulb"></i>
+        </div>
+
+        <div>
+            <h3>Une passerelle vers le monde professionnel</h3>
+            <p>
+                Stage&Emploi a pour objectif de simplifier la recherche
+                de stages et d'emplois. Les étudiants peuvent consulter
+                les offres disponibles et envoyer leurs candidatures.
+                Les entreprises peuvent publier leurs offres et suivre
+                les candidatures reçues depuis leur espace personnel.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="about-mission-section">
+    <div class="container">
+        <div class="about-section-heading">
+            <span>CE QUI NOUS ANIME</span>
+            <h2>Notre mission et nos objectifs</h2>
+            <p>
+                Faciliter l'accès aux opportunités et accompagner
+                les utilisateurs dans leur parcours professionnel.
+            </p>
+        </div>
+
+        <div class="about-values-grid">
+
+            <article class="about-value-card">
+                <div class="about-value-icon purple">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3>Notre mission</h3>
+                <p>
+                    Mettre en relation les étudiants et les entreprises
+                    grâce à un espace simple et accessible.
+                </p>
+            </article>
+
+            <article class="about-value-card">
+                <div class="about-value-icon pink">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <h3>Notre objectif</h3>
+                <p>
+                    Faciliter la recherche de stages et d'emplois
+                    et rendre les opportunités plus accessibles.
+                </p>
+            </article>
+
+            <article class="about-value-card">
+                <div class="about-value-icon blue">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <h3>Notre engagement</h3>
+                <p>
+                    Proposer une expérience pratique pour consulter
+                    les offres, candidater et gérer les recrutements.
+                </p>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<section class="about-features container">
+    <div class="about-section-heading">
+        <span>NOTRE PLATEFORME</span>
+        <h2>Que peut-on faire sur Stage&Emploi ?</h2>
+        <p>
+            Des fonctionnalités adaptées aux besoins des étudiants
+            et des entreprises.
+        </p>
+    </div>
+
+    <div class="about-feature-list">
+
+        <div class="about-feature-item">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <div>
+                <h3>Rechercher des opportunités</h3>
+                <p>Consulter les offres de stage et d'emploi disponibles.</p>
+            </div>
+        </div>
+
+        <div class="about-feature-item">
+            <i class="fa-solid fa-file-circle-check"></i>
+            <div>
+                <h3>Postuler facilement</h3>
+                <p>Envoyer une candidature et suivre son évolution.</p>
+            </div>
+        </div>
+
+        <div class="about-feature-item">
+            <i class="fa-solid fa-building"></i>
+            <div>
+                <h3>Publier des offres</h3>
+                <p>Permettre aux entreprises de présenter leurs opportunités.</p>
+            </div>
+        </div>
+
+        <div class="about-feature-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <div>
+                <h3>Gérer les candidatures</h3>
+                <p>Suivre les candidatures et mettre à jour leur statut.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="about-cta">
+    <div>
+        <span>VOTRE AVENIR COMMENCE ICI</span>
+        <h2>Prêt à découvrir de nouvelles opportunités ?</h2>
+        <p>Rejoignez Stage&Emploi et avancez vers votre avenir professionnel.</p>
+    </div>
+
+    <a href="{% url 'inscription' %}" class="about-cta-button">
+        Créer un compte
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+</section>
+
+{% endblock %}

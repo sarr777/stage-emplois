@@ -1,0 +1,294 @@
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Utilisateurs | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}Gestion des utilisateurs{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">GESTION DES COMPTES</span>
+        <h1>Utilisateurs</h1>
+        <p>Consultez et gérez les comptes de la plateforme.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="contact-alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="contact-stats">
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-users"></i>
+        <div>
+            <h3>{{ total_utilisateurs }}</h3>
+            <p>Total utilisateurs</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+            <h3>{{ total_actifs }}</h3>
+            <p>Comptes actifs</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+            <h3>{{ total_inactifs }}</h3>
+            <p>Comptes inactifs</p>
+        </div>
+    </div>
+</div>
+
+<section class="contact-admin-panel">
+
+    <div class="contact-admin-heading">
+        <div>
+            <h2>Liste des utilisateurs</h2>
+            <p>Comptes inscrits sur Stage&Emploi</p>
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+
+            <form method="GET" class="contact-search">
+                <input type="text" name="recherche"
+                    value="{{ recherche }}"
+                    placeholder="Rechercher un utilisateur...">
+                <button type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+
+            <button type="button" class="btn-primary"
+                    onclick="ouvrirAjout()">
+                <i class="fa-solid fa-plus"></i>
+                Ajouter un utilisateur
+            </button>
+
+        </div>
+    </div>
+
+    <div class="contact-table-wrapper">
+        <table class="contact-admin-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>E-mail</th>
+                    <th>Rôle</th>
+                    <th>Inscription</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for utilisateur in utilisateurs %}
+                <tr>
+                    <td>
+                        <strong>{{ utilisateur.username }}</strong>
+                        <small>
+                            {{ utilisateur.first_name }} {{ utilisateur.last_name }}
+                        </small>
+                    </td>
+
+                    <td>{{ utilisateur.email }}</td>
+
+                    <td>{{ utilisateur.get_role_display }}</td>
+
+                    <td>{{ utilisateur.date_joined|date:"d/m/Y" }}</td>
+
+                    <td>
+                        {% if utilisateur.is_active %}
+                            <span class="contact-badge read">Actif</span>
+                        {% else %}
+                            <span class="contact-badge unread">Inactif</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="contact-actions">
+
+                        {% if utilisateur != request.user %}
+
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="utilisateur_id"
+                                       value="{{ utilisateur.id }}">
+
+                                {% if utilisateur.is_active %}
+                                    <input type="hidden" name="action" value="desactiver">
+                                    <button class="contact-status-btn"
+                                            title="Désactiver">
+                                        <i class="fa-solid fa-user-slash"></i>
+                                    </button>
+                                {% else %}
+                                    <input type="hidden" name="action" value="activer">
+                                    <button class="contact-status-btn"
+                                            title="Activer">
+                                        <i class="fa-solid fa-user-check"></i>
+                                    </button>
+                                {% endif %}
+                                <button type="button"
+                                    class="contact-status-btn"
+                                    title="Modifier"
+                                    onclick="ouvrirModification(
+                                        '{{ utilisateur.id }}',
+                                        '{{ utilisateur.username|escapejs }}',
+                                        '{{ utilisateur.first_name|escapejs }}',
+                                        '{{ utilisateur.last_name|escapejs }}',
+                                        '{{ utilisateur.email|escapejs }}',
+                                        '{{ utilisateur.role }}'
+                                    )">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                            </form>
+
+                            {% if not utilisateur.is_superuser %}
+                                <form method="POST"
+                                      onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="utilisateur_id"
+                                           value="{{ utilisateur.id }}">
+                                    <input type="hidden" name="action"
+                                           value="supprimer">
+                                    <button class="contact-delete-btn"
+                                            title="Supprimer">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                        {% else %}
+                            <span class="contact-badge read">Votre compte</span>
+                        {% endif %}
+
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="contact-empty">
+                        <i class="fa-solid fa-users"></i>
+                        <h3>Aucun utilisateur trouvé</h3>
+                        <p>Les utilisateurs apparaîtront ici.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+<div id="modalAjout" class="contact-modal">
+    <div class="contact-modal-content">
+
+        <h2>Ajouter un utilisateur</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="ajouter">
+
+            <label>Nom d'utilisateur *</label>
+            <input type="text" name="username" required>
+
+            <label>Prénom</label>
+            <input type="text" name="first_name">
+
+            <label>Nom</label>
+            <input type="text" name="last_name">
+
+            <label>Adresse e-mail *</label>
+            <input type="email" name="email" required>
+
+            <label>Mot de passe *</label>
+            <input type="password" name="password" minlength="8" required>
+
+            <label>Rôle *</label>
+            <select name="role" required>
+                <option value="ETUDIANT">Étudiant</option>
+                <option value="ENTREPRISE">Entreprise</option>
+                <option value="ADMIN">Administrateur</option>
+            </select>
+
+            <div class="modal-actions">
+                <button type="button" onclick="fermerAjout()">
+                    Annuler
+                </button>
+                <button type="submit">
+                    Ajouter
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<div id="modalModification" class="contact-modal">
+    <div class="contact-modal-content">
+        <h2>Modifier un utilisateur</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="utilisateur_id" id="edit_id">
+            <input type="hidden" name="action" value="modifier">
+
+            <label>Nom d'utilisateur</label>
+            <input type="text" name="username" id="edit_username" required>
+
+            <label>Prénom</label>
+            <input type="text" name="first_name" id="edit_first_name">
+
+            <label>Nom</label>
+            <input type="text" name="last_name" id="edit_last_name">
+
+            <label>Adresse e-mail</label>
+            <input type="email" name="email" id="edit_email" required>
+
+            <label>Rôle</label>
+            <select name="role" id="edit_role" required>
+                <option value="ETUDIANT">Étudiant</option>
+                <option value="ENTREPRISE">Entreprise</option>
+                <option value="ADMIN">Administrateur</option>
+            </select>
+
+            <div class="modal-actions">
+                <button type="button" onclick="fermerModification()">Annuler</button>
+                <button type="submit">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function ouvrirAjout() {
+    document.getElementById('modalAjout').style.display = 'flex';
+}
+
+function fermerAjout() {
+    document.getElementById('modalAjout').style.display = 'none';
+}
+function ouvrirModification(id, username, firstName, lastName, email, role) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_first_name').value = firstName;
+    document.getElementById('edit_last_name').value = lastName;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_role').value = role;
+
+    document.getElementById('modalModification').style.display = 'flex';
+}
+
+function fermerModification() {
+    document.getElementById('modalModification').style.display = 'none';
+}
+</script>
+
+
+{% endblock %}

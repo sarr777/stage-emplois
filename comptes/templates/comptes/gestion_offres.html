@@ -1,0 +1,254 @@
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Offres | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}Gestion des offres{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">GESTION DES OPPORTUNITÉS</span>
+        <h1>Offres</h1>
+        <p>Consultez et gérez toutes les offres de stage et d'emploi.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="contact-alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<!-- STATISTIQUES -->
+<div class="contact-stats">
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-briefcase"></i>
+        <div>
+            <h3>{{ total_offres }}</h3>
+            <p>Total offres</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+            <h3>{{ offres_actives }}</h3>
+            <p>Offres actives</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+            <h3>{{ offres_inactives }}</h3>
+            <p>Offres inactives</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- LISTE DES OFFRES -->
+<section class="contact-admin-panel">
+
+    <div class="contact-admin-heading">
+        <div>
+            <h2>Liste des offres</h2>
+            <p>Toutes les opportunités publiées par les entreprises</p>
+        </div>
+
+        <form method="GET" class="contact-search">
+            <input
+                type="text"
+                name="recherche"
+                value="{{ recherche }}"
+                placeholder="Rechercher une offre..."
+            >
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="contact-table-wrapper">
+        <table class="contact-admin-table">
+
+            <thead>
+                <tr>
+                    <th>Offre</th>
+                    <th>Entreprise</th>
+                    <th>Type</th>
+                    <th>Localisation</th>
+                    <th>Date limite</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for offre in offres %}
+
+                <tr>
+                    <td>
+                        <strong>{{ offre.titre }}</strong>
+                        <small>{{ offre.secteur }}</small>
+                    </td>
+
+                    <td>{{ offre.entreprise.nom_entreprise }}</td>
+
+                    <td>{{ offre.get_type_offre_display }}</td>
+
+                    <td>{{ offre.localisation }}</td>
+
+                    <td>{{ offre.date_limite|date:"d/m/Y" }}</td>
+
+                    <td>
+                        {% if offre.statut %}
+                            <span class="contact-badge read">Active</span>
+                        {% else %}
+                            <span class="contact-badge unread">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="contact-actions">
+
+                        <!-- MODIFIER -->
+                        <button type="button"
+                            data-date="{{ offre.date_limite|date:'Y-m-d' }}"
+                            onclick="ouvrirModification(
+                                '{{ offre.id }}',
+                                '{{ offre.titre|escapejs }}',
+                                '{{ offre.description|escapejs }}',
+                                '{{ offre.type_offre }}',
+                                '{{ offre.localisation|escapejs }}',
+                                '{{ offre.secteur|escapejs }}',
+                                this.dataset.date
+                            )">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+
+                        <!-- ACTIVER / DESACTIVER -->
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="offre_id" value="{{ offre.id }}">
+
+                            {% if offre.statut %}
+                                <input type="hidden" name="action" value="desactiver">
+                                <button type="submit"
+                                        class="contact-status-btn"
+                                        title="Désactiver">
+                                    <i class="fa-solid fa-toggle-on"></i>
+                                </button>
+                            {% else %}
+                                <input type="hidden" name="action" value="activer">
+                                <button type="submit"
+                                        class="contact-status-btn"
+                                        title="Activer">
+                                    <i class="fa-solid fa-toggle-off"></i>
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <!-- SUPPRIMER -->
+                        <form method="POST"
+                              onsubmit="return confirm('Voulez-vous vraiment supprimer cette offre ?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="offre_id" value="{{ offre.id }}">
+                            <input type="hidden" name="action" value="supprimer">
+
+                            <button type="submit"
+                                    class="contact-delete-btn"
+                                    title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7" class="contact-empty">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <h3>Aucune offre trouvée</h3>
+                        <p>Les offres apparaîtront ici.</p>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- FENÊTRE DE MODIFICATION -->
+<div id="modalModification" class="contact-modal">
+
+    <div class="contact-modal-content">
+
+        <h2>Modifier une offre</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input type="hidden" name="offre_id" id="edit_id">
+            <input type="hidden" name="action" value="modifier">
+
+            <label>Titre de l'offre</label>
+            <input type="text" name="titre" id="edit_titre" required>
+
+            <label>Description</label>
+            <textarea name="description" id="edit_description" rows="4" required></textarea>
+
+            <label>Type d'offre</label>
+            <select name="type_offre" id="edit_type" required>
+                <option value="STAGE">Stage</option>
+                <option value="EMPLOI">Emploi</option>
+            </select>
+
+            <label>Localisation</label>
+            <input type="text" name="localisation" id="edit_localisation" required>
+
+            <label>Secteur</label>
+            <input type="text" name="secteur" id="edit_secteur" required>
+
+            <label>Date limite</label>
+            <input type="date" name="date_limite" id="edit_date_limite" required>
+
+            <div class="modal-actions">
+                <button type="button" onclick="fermerModification()">
+                    Annuler
+                </button>
+
+                <button type="submit">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+function ouvrirModification(id, titre, description, type, localisation, secteur, dateLimite) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_titre').value = titre;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('edit_type').value = type;
+    document.getElementById('edit_localisation').value = localisation;
+    document.getElementById('edit_secteur').value = secteur;
+    document.getElementById('edit_date_limite').value = dateLimite;
+
+    document.getElementById('modalModification').style.display = 'flex';
+}
+
+function fermerModification() {
+    document.getElementById('modalModification').style.display = 'none';
+}
+</script>
+
+{% endblock %}

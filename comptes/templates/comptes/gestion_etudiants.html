@@ -1,0 +1,181 @@
+{% extends 'comptes/base_admin.html' %}
+
+{% block title %}Étudiants | Stage&Emploi{% endblock %}
+
+{% block topbar_description %}Gestion des étudiants{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <span class="section-tag">GESTION DES COMPTES</span>
+        <h1>Étudiants</h1>
+        <p>Consultez et suivez les profils des étudiants inscrits.</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="contact-alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="contact-stats">
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-user-graduate"></i>
+        <div>
+            <h3>{{ total_etudiants }}</h3>
+            <p>Total étudiants</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+            <h3>{{ etudiants_actifs }}</h3>
+            <p>Comptes actifs</p>
+        </div>
+    </div>
+
+    <div class="contact-stat-card">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+            <h3>{{ etudiants_inactifs }}</h3>
+            <p>Comptes inactifs</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="contact-admin-panel">
+
+    <div class="contact-admin-heading">
+        <div>
+            <h2>Liste des étudiants</h2>
+            <p>Ensemble des profils étudiants de la plateforme</p>
+        </div>
+
+        <form method="GET" class="contact-search">
+            <input
+                type="text"
+                name="recherche"
+                value="{{ recherche }}"
+                placeholder="Rechercher un étudiant..."
+            >
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="contact-table-wrapper">
+        <table class="contact-admin-table">
+
+            <thead>
+                <tr>
+                    <th>Étudiant</th>
+                    <th>E-mail</th>
+                    <th>Formation</th>
+                    <th>Compétences</th>
+                    <th>Statut</th>
+                    <th>Inscription</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for etudiant in etudiants %}
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ etudiant.utilisateur.username }}
+                        </strong>
+                        <small>
+                            {{ etudiant.utilisateur.first_name }}
+                            {{ etudiant.utilisateur.last_name }}
+                        </small>
+                    </td>
+
+                    <td>{{ etudiant.utilisateur.email }}</td>
+
+                    <td>{{ etudiant.formation }}</td>
+
+                    <td>
+                        {% if etudiant.competences %}
+                            {{ etudiant.competences|truncatechars:55 }}
+                        {% else %}
+                            <span>Non renseignées</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if etudiant.utilisateur.is_active %}
+                            <span class="contact-badge read">Actif</span>
+                        {% else %}
+                            <span class="contact-badge unread">Inactif</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ etudiant.utilisateur.date_joined|date:"d/m/Y" }}
+                    </td>
+
+                    <td class="contact-actions">
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="etudiant_id" value="{{ etudiant.id }}">
+
+                            {% if etudiant.utilisateur.is_active %}
+                                <input type="hidden" name="action" value="desactiver">
+                                <button type="submit"
+                                        class="contact-status-btn"
+                                        title="Désactiver">
+                                    <i class="fa-solid fa-user-slash"></i>
+                                </button>
+                            {% else %}
+                                <input type="hidden" name="action" value="activer">
+                                <button type="submit"
+                                        class="contact-status-btn"
+                                        title="Activer">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <form method="POST"
+                            onsubmit="return confirm('Voulez-vous vraiment supprimer cet étudiant ?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="etudiant_id" value="{{ etudiant.id }}">
+                            <input type="hidden" name="action" value="supprimer">
+
+                            <button type="submit"
+                                    class="contact-delete-btn"
+                                    title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="contact-empty">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <h3>Aucun étudiant trouvé</h3>
+                        <p>Les profils étudiants apparaîtront ici.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</section>
+
+{% endblock %}

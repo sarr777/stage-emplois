@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Stage & Emploi{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="{% url 'accueil' %}" class="logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>
+            Stage<span class="logo-purple">&Emploi</span>
+            <small>Construisez votre avenir</small>
+        </span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="{% url 'accueil' %}" class="active">
+            <i class="fa-solid fa-house"></i> Accueil
+        </a>
+        <a href="{% url 'liste_offres' %}">
+            <i class="fa-solid fa-briefcase"></i> Offres
+        </a>
+        <a href="{% url 'apropos' %}"
+        class="{% if request.resolver_match.url_name == 'apropos' %}active{% endif %}">
+            <i class="fa-solid fa-circle-info"></i> À propos
+        </a>
+        <a href="{% url 'contact' %}">
+           <i class="fa-solid fa-envelope"></i> Contact
+        </a>
+        
+    </nav>
+
+    <div class="nav-actions">
+        {% if user.is_authenticated %}
+            {% if user.role == 'ETUDIANT' %}
+                <a href="{% url 'tableau_etudiant' %}" class="btn-outline">
+                    Mon espace
+                </a>
+            {% elif user.role == 'ENTREPRISE' %}
+                <a href="{% url 'tableau_entreprise' %}" class="btn-outline">
+                    Mon espace
+                </a>
+            {% endif %}
+            <a href="{% url 'deconnexion' %}" class="btn-primary">
+                Déconnexion
+            </a>
+        {% else %}
+            <a href="{% url 'connexion' %}" class="btn-outline">
+                <i class="fa-regular fa-user"></i> Connexion
+            </a>
+            <a href="{% url 'inscription' %}" class="btn-primary">
+                <i class="fa-solid fa-user-plus"></i> Inscription
+            </a>
+        {% endif %}
+    </div>
+</header>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer class="footer" id="contact">
+    <p>© 2026 Stage & Emploi — Construisez votre avenir professionnel.</p>
+</footer>
+
+</body>
+</html>

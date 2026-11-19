@@ -1,0 +1,456 @@
+
+{% extends 'comptes/base.html' %}
+{% load static %}
+
+{% block title %}Accueil | Stage & Emploi{% endblock %}
+
+{% block content %}
+
+<!-- ================= BANNIERE PRINCIPALE ================= -->
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-label">
+            <i class="fa-solid fa-sparkles"></i>
+            BIENVENUE SUR STAGE & EMPLOI
+        </span>
+
+        <h1>
+            Trouvez votre <span>stage</span><br>
+            ou votre <span>emploi</span> idéal
+        </h1>
+
+        <p>
+            Une plateforme moderne pour connecter les talents
+            aux opportunités professionnelles et accompagner
+            chaque personne vers son avenir.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'liste_offres' %}" class="btn-primary">
+                Découvrir les offres
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <a href="{% url 'apropos' %}" class="btn-outline">
+                <i class="fa-solid fa-circle-info"></i>
+                En savoir plus
+            </a>
+        </div>
+
+        <div class="hero-trust">
+            <div class="hero-trust-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <p>
+                <strong>Un avenir à construire</strong>
+                <small>Étudiants et entreprises réunis</small>
+            </p>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <img src="{% static 'images/etudiants.png' %}"
+             alt="Étudiants travaillant ensemble sur un ordinateur">
+    </div>
+</section>
+
+<!-- ================= BARRE DE RECHERCHE ================= -->
+<section class="search-section">
+    <form method="GET" action="{% url 'liste_offres' %}"
+          class="search-bar">
+
+        <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="recherche"
+                   placeholder="Rechercher une offre...">
+        </div>
+
+        <div class="search-select">
+            <i class="fa-solid fa-briefcase"></i>
+            <select name="type_offre">
+                <option value="">Tous les types</option>
+                <option value="STAGE">Stage</option>
+                <option value="EMPLOI">Emploi</option>
+            </select>
+        </div>
+
+        <div class="search-input">
+            <i class="fa-solid fa-location-dot"></i>
+            <input type="text" name="localisation"
+                   placeholder="Toutes les villes">
+        </div>
+
+        <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Rechercher
+        </button>
+    </form>
+</section>
+
+<!-- ================= FONCTIONNALITES ================= -->
+<section class="features container" id="apropos">
+
+    <div class="feature-card feature-one">
+        <div class="feature-icon">
+            <i class="fa-solid fa-rocket"></i>
+        </div>
+        <div>
+            <h3>Offres variées</h3>
+            <p>Stages & emplois</p>
+        </div>
+    </div>
+
+    <div class="feature-card feature-two">
+        <div class="feature-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+            <h3>Candidature simple</h3>
+            <p>En quelques clics</p>
+        </div>
+    </div>
+
+    <div class="feature-card feature-three">
+        <div class="feature-icon">
+            <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div>
+            <h3>Suivi en temps réel</h3>
+            <p>De vos candidatures</p>
+        </div>
+    </div>
+
+    <div class="feature-card feature-four">
+        <div class="feature-icon">
+            <i class="fa-solid fa-handshake"></i>
+        </div>
+        <div>
+            <h3>Connexion directe</h3>
+            <p>Avec les entreprises</p>
+        </div>
+    </div>
+
+</section>
+
+<!-- ================= PRESENTATION ================= -->
+<section class="home-about-section">
+    <div class="container home-about-grid">
+
+        <div class="home-about-visual">
+            <div class="home-about-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <div class="home-about-floating">
+                <i class="fa-solid fa-star"></i>
+                <div>
+                    <strong>Votre avenir</strong>
+                    <small>Notre priorité</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-about-content">
+            <span class="home-section-label">QUI SOMMES-NOUS ?</span>
+            <h2>
+                Une passerelle entre
+                <span>les talents et les opportunités</span>
+            </h2>
+
+            <p>
+                Stage&Emploi est une plateforme dédiée à la mise en
+                relation des étudiants et des entreprises. Elle facilite
+                la recherche de stages et d'emplois, la publication
+                d'offres et le suivi des candidatures.
+            </p>
+
+            <p>
+                Notre objectif est de rendre les opportunités
+                professionnelles plus accessibles et de simplifier
+                les démarches pour tous les utilisateurs.
+            </p>
+
+            <a href="{% url 'apropos' %}" class="home-text-link">
+                En savoir plus sur nous
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= OFFRES RECENTES ================= -->
+<section class="recent-section container">
+
+    <div class="section-heading">
+        <div>
+            <span class="home-section-label">OPPORTUNITÉS</span>
+            <h2>Offres récentes</h2>
+            <p>Découvrez les dernières opportunités professionnelles.</p>
+        </div>
+
+        <a href="{% url 'liste_offres' %}" class="btn-outline">
+            Voir toutes les offres
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="offers-grid">
+
+        {% for offre in offres %}
+        <article class="offer-card">
+
+            <div class="offer-top">
+                <div class="company-logo">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <span class="offer-type">
+                    {{ offre.get_type_offre_display }}
+                </span>
+            </div>
+
+            <h3>{{ offre.titre }}</h3>
+
+            <p class="company-name">
+                {{ offre.entreprise.nom_entreprise }}
+            </p>
+
+            <p class="offer-location">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ offre.localisation }}
+            </p>
+
+            <div class="offer-bottom">
+                <span>
+                    <i class="fa-regular fa-calendar"></i>
+                    {{ offre.date_limite|date:"d M Y" }}
+                </span>
+
+                <a href="{% url 'liste_offres' %}" class="btn-primary">
+                    Voir l'offre
+                </a>
+            </div>
+
+        </article>
+
+        {% empty %}
+        <div class="empty-offers">
+            <i class="fa-solid fa-briefcase"></i>
+            <h3>Aucune offre disponible pour le moment</h3>
+            <p>Les nouvelles opportunités apparaîtront ici.</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <div class="community-card">
+        <div class="community-content">
+            <i class="fa-solid fa-trophy"></i>
+
+            <h3>
+                Rejoignez une communauté
+                de talents et d'entreprises
+            </h3>
+
+            <p>
+                Ensemble, construisons votre avenir professionnel.
+            </p>
+
+            <a href="{% url 'inscription' %}" class="community-button">
+                Créer un compte
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+</section>
+
+<!-- ================= COMMENT CA MARCHE ================= -->
+<section class="how-section">
+    <div class="container">
+
+        <div class="home-section-heading">
+            <span class="home-section-label">SIMPLE ET RAPIDE</span>
+            <h2>Comment fonctionne la plateforme ?</h2>
+            <p>
+                Quelques étapes suffisent pour commencer votre parcours
+                professionnel avec Stage&Emploi.
+            </p>
+        </div>
+
+        <div class="how-grid">
+
+            <article class="how-card">
+                <span class="how-number">01</span>
+                <div class="how-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3>Créez votre compte</h3>
+                <p>
+                    Inscrivez-vous en tant qu'étudiant ou entreprise
+                    et complétez votre profil.
+                </p>
+            </article>
+
+            <article class="how-card">
+                <span class="how-number">02</span>
+                <div class="how-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3>Explorez les offres</h3>
+                <p>
+                    Découvrez les opportunités disponibles et choisissez
+                    celles qui correspondent à vos besoins.
+                </p>
+            </article>
+
+            <article class="how-card">
+                <span class="how-number">03</span>
+                <div class="how-icon">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <h3>Envoyez votre candidature</h3>
+                <p>
+                    Postulez aux offres qui vous intéressent et suivez
+                    l'évolution de vos demandes.
+                </p>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= ESPACE ETUDIANTS ================= -->
+<section class="audience-section container">
+
+    <div class="audience-card student-audience">
+        <div class="audience-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+
+        <span>ESPACE ÉTUDIANT</span>
+        <h2>Donnez vie à votre avenir professionnel.</h2>
+
+        <p>
+            Découvrez des offres de stage et d'emploi,
+            postulez facilement et suivez vos candidatures
+            depuis votre espace personnel.
+        </p>
+
+        <a href="{% url 'inscription' %}" class="audience-link">
+            Rejoindre comme étudiant
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <i class="fa-solid fa-graduation-cap audience-decoration"></i>
+    </div>
+
+    <div class="audience-card company-audience">
+        <div class="audience-icon">
+            <i class="fa-solid fa-building"></i>
+        </div>
+
+        <span>ESPACE ENTREPRISE</span>
+        <h2>Découvrez de nouveaux talents.</h2>
+
+        <p>
+            Publiez vos offres, recevez des candidatures
+            et gérez vos recrutements depuis votre espace
+            entreprise.
+        </p>
+
+        <a href="{% url 'inscription' %}" class="audience-link">
+            Rejoindre comme entreprise
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <i class="fa-solid fa-briefcase audience-decoration"></i>
+    </div>
+
+</section>
+
+<!-- ================= NOS AVANTAGES ================= -->
+<section class="benefits-section">
+    <div class="container">
+
+        <div class="home-section-heading">
+            <span class="home-section-label">POURQUOI NOUS CHOISIR ?</span>
+            <h2>Une plateforme pensée pour vous</h2>
+            <p>
+                Tout ce dont vous avez besoin pour simplifier
+                votre parcours professionnel.
+            </p>
+        </div>
+
+        <div class="benefits-grid">
+
+            <div class="benefit-item">
+                <i class="fa-solid fa-laptop"></i>
+                <h3>Accessible en ligne</h3>
+                <p>
+                    Consultez la plateforme depuis votre ordinateur
+                    ou votre téléphone.
+                </p>
+            </div>
+
+            <div class="benefit-item">
+                <i class="fa-solid fa-clock"></i>
+                <h3>Gain de temps</h3>
+                <p>
+                    Retrouvez les opportunités et gérez vos démarches
+                    au même endroit.
+                </p>
+            </div>
+
+            <div class="benefit-item">
+                <i class="fa-solid fa-list-check"></i>
+                <h3>Suivi simplifié</h3>
+                <p>
+                    Gardez une vue claire sur l'évolution
+                    de vos candidatures.
+                </p>
+            </div>
+
+            <div class="benefit-item">
+                <i class="fa-solid fa-people-group"></i>
+                <h3>Deux espaces dédiés</h3>
+                <p>
+                    Des fonctionnalités adaptées aux étudiants
+                    et aux entreprises.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= APPEL A L'ACTION ================= -->
+<section class="final-cta-section">
+    <div class="final-cta-content">
+        <span>VOTRE AVENIR COMMENCE MAINTENANT</span>
+
+        <h2>
+            La prochaine opportunité
+            pourrait être la vôtre.
+        </h2>
+
+        <p>
+            Rejoignez Stage&Emploi et faites le premier pas
+            vers de nouvelles perspectives professionnelles.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'inscription' %}" class="final-cta-button">
+                Créer mon compte
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <a href="{% url 'liste_offres' %}" class="final-cta-outline">
+                Explorer les offres
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

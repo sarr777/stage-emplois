@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Administration | Stage&Emploi{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/admin-dashboard.css' %}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            <i class="fas fa-graduation-cap"></i>
+            <div>
+                <strong>Stage&Emploi</strong>
+                <small>Administration</small>
+            </div>
+        </div>
+
+        <div class="sidebar-label">MENU PRINCIPAL</div>
+
+        <nav class="sidebar-menu">
+            <a href="{% url 'tableau_admin' %}" class="active">
+                <i class="fas fa-chart-pie"></i>
+                Tableau de bord
+            </a>
+
+            <div class="sidebar-label">GESTION</div>
+
+            <a href="{% url 'admin:comptes_utilisateur_changelist' %}">
+                <i class="fas fa-users"></i>
+                Utilisateurs
+            </a>
+
+            <a href="{% url 'admin:comptes_etudiant_changelist' %}">
+                <i class="fas fa-user-graduate"></i>
+                Étudiants
+            </a>
+
+            <a href="{% url 'admin:comptes_entreprise_changelist' %}">
+                <i class="fas fa-building"></i>
+                Entreprises
+            </a>
+
+            <a href="{% url 'admin:offres_offre_changelist' %}">
+                <i class="fas fa-briefcase"></i>
+                Offres
+            </a>
+
+            <a href="{% url 'admin:candidatures_candidature_changelist' %}">
+                <i class="fas fa-file-alt"></i>
+                Candidatures
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'accueil' %}">
+                <i class="fas fa-globe"></i>
+                Voir le site
+            </a>
+            <a href="{% url 'deconnexion' %}">
+                <i class="fas fa-sign-out-alt"></i>
+                Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="admin-main">
+
+        <header class="admin-navbar">
+            <div>
+                <span class="navbar-title">Espace administrateur</span>
+            </div>
+
+            <div class="admin-user">
+                <div class="admin-avatar">
+                    {{ request.user.username|first|upper }}
+                </div>
+                <span>{{ request.user.username }}</span>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="admin-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>
